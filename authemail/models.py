@@ -158,7 +158,8 @@ def send_multi_format_email(template_prefix, template_ctxt, target_email):
 
 
 class AbstractBaseCode(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
     code = models.CharField(_('code'), max_length=40, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -170,7 +171,8 @@ class AbstractBaseCode(models.Model):
             'email': self.user.email,
             'first_name': self.user.first_name,
             'last_name': self.user.last_name,
-            'code': self.code
+            'code': self.code,
+            'base_url': settings.EMAIL_BASE_URL,
         }
         send_multi_format_email(prefix, ctxt, target_email=self.user.email)
 
