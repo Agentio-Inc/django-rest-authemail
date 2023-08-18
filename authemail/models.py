@@ -1,14 +1,15 @@
 import binascii
 import os
+
 from django.conf import settings
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
+from django.core.mail import send_mail
 from django.core.mail.message import EmailMultiAlternatives
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.core.mail import send_mail
 
 # Make part of the model eventually, so it can be edited
 EXPIRY_PERIOD = 3    # days
@@ -151,8 +152,11 @@ def send_multi_format_email(template_prefix, template_ctxt, target_email):
     bcc_email = settings.EMAIL_BCC
     text_content = render_to_string(txt_file, template_ctxt)
     html_content = render_to_string(html_file, template_ctxt)
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to],
-                                 bcc=[bcc_email])
+    if bcc_email:
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to],
+                                    bcc=[bcc_email])
+    else:
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
 
